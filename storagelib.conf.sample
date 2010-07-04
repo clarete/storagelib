@@ -1,0 +1,27 @@
+[temporary]
+type = local
+dest = /tmp
+name_policy = preserve
+structure = simple
+base_uri = file:///tmp
+priority = 10
+
+[videocdbr]
+type = local
+dest = /srv/apps/videocdbr/data/files
+name_policy = random
+structure = subfolder
+base_uri = http://files.videocdbr.cabare
+priority = 0
+weight = 10
+
+[vodka]
+type = ssh
+dest = /var/www/files
+name_policy = random
+structure = simple
+base_uri = http://vodka.buteco/files
+host = vodka.buteco
+user = lincoln
+priority = 0
+weight = 10
