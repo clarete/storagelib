@@ -1,6 +1,6 @@
 # -*- Coding: utf-8; Mode: Python -*-
 #
-# videocdbrd - Executable that launches the video platform
+# ssh.py - A plugin to storagelib be able to store files through ssh
 #
 # Copyright (C) 2010  Lincoln de Sousa <lincoln@comum.org>
 #
