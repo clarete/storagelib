@@ -32,10 +32,52 @@ weights.
 """
 
 import sys
-from random import randint
+import os
+from datetime import datetime
+from random import randint, choice
 from ConfigParser import ConfigParser
 
+_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
 _STORAGES = {}
+
+_NAME_POLICIES = {}
+
+def np_random(path):
+    """Creates a random name for a file being stored
+    """
+    npath = os.path.join(
+        os.path.dirname(path),
+        ''.join(choice(_CHARS) for x in range(10)))
+    while os.path.exists(npath):
+        npath = np_random(npath)
+    return npath
+_NAME_POLICIES['random'] = np_random
+
+def np_preserve(path):
+    """Tries to preserve the name of a file but when it already
+    exists, we add the date
+    """
+    npath = path
+    while os.path.exists(npath):
+        npath = path + '.'
+        npath += datetime.now().strftime('%Y%m%d-%H%M%S')
+    return npath
+_NAME_POLICIES['preserve'] = np_preserve
+
+def np_preserve_ext(path):
+    """Generates a random name but preserves the extension of the
+    given file.
+    """
+    ext = os.path.splitext(path)[1]
+    npath = os.path.join(
+        os.path.dirname(path),
+        ''.join(choice(_CHARS) for x in range(10)))
+    npath += ext
+    while os.path.exists(npath):
+        npath = np_preserve_ext(npath)
+    return npath
+_NAME_POLICIES['preserve_ext'] = np_preserve_ext
 
 class Attr(object):
     """A helper class to mark attributes of plugins.
@@ -83,6 +125,33 @@ class BaseStorage(object):
     structure = None
     priority = 0
     weight = 0
+
+    def get_name(self, path):
+        """Gets a name for the file being sored.
+
+        The name is not actually created/choosen by this method. It
+        only calls the proper name policy giving the original name as
+        argument.
+        """
+        npolicy = _NAME_POLICIES[self.name_policy]
+        return npolicy(path)
+
+    def setup(self):
+        """Tries to setup everything needed to ensure that this
+        storage is working. Returns True if everything is ok and False
+        otherwise.
+        """
+        if not os.access(self.dest, os.W_OK):
+            return False
+        return True
+
+    def store(self, finst):
+        """Actually stores the file.
+        """
+        fname = os.path.basename(finst.name)
+        fpath = os.path.join(self.dest, fname)
+        fpath = self.get_name(fpath)
+        open(fpath, 'w').write(finst.read())
 
 class SshStorage(BaseStorage):
     """A ssh storage
@@ -182,5 +251,21 @@ class StorageContext(object):
                 sum_ -= repo.weight
                 count -= 1
 
+    def store(self, finst):
+        """Sort all storages again, look for the first working one and
+        then stores the file.
+        """
+        self.sort_repos()
+        for storage in self.repo_list:
+            if not storage.setup():
+                continue
+            return storage.store(finst)
+
+def test():
+    """Call the API with fake params to test
+    """
+    ctx = StorageContext(sys.argv[1])
+    ctx.store(file('/etc/resolv.conf'))
+
 if __name__ == '__main__':
-    StorageContext(sys.argv[1])
+    test()

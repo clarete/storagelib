@@ -8,8 +8,8 @@ priority = 10
 
 [videocdbr]
 type = local
-dest = /srv/apps/videocdbr/data/files
-name_policy = random
+dest = /srv/apps/lincoln/videocdbr/data/files
+name_policy = preserve_ext
 structure = subfolder
 base_uri = http://files.videocdbr.cabare
 priority = 0
@@ -23,5 +23,5 @@ structure = simple
 base_uri = http://vodka.buteco/files
 host = vodka.buteco
 user = lincoln
-priority = 0
+priority = 1
 weight = 10
