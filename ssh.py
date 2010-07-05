@@ -64,16 +64,14 @@ class Storage(BaseStorage):
     def store(self, finst):
         """Stores the file using the paramiko.SFTPClient object
         """
-        fname = os.path.basename(finst.name)
-        fpath = os.path.join(self.dest, fname)
-        fpath = self.get_name(fpath)
-        self.client.open(fpath, 'w').write(finst.read())
+        name = self.get_name(finst)
+        self.client.open(name, 'w').write(finst.read())
 
         # Closing ssh connection
         self.client.close()
 
         # Time to say to the user where's the uploaded file
-        new_name = os.path.basename(fpath)
+        new_name = os.path.basename(name)
         if not self.base_uri.endswith('/'):
             self.base_uri += '/'
         return self.base_uri + new_name

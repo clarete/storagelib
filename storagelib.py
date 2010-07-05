@@ -133,15 +133,18 @@ class BaseStorage(object):
     priority = 0
     weight = 0
 
-    def get_name(self, path):
+    def get_name(self, finst):
         """Gets a name for the file being sored.
 
         The name is not actually created/choosen by this method. It
         only calls the proper name policy giving the original name as
         argument.
         """
+        fname = getattr(finst, 'filename', finst.name)
+        fname = os.path.basename(fname)
+        fpath = os.path.join(self.dest, fname)
         npolicy = _NAME_POLICIES[self.name_policy]
-        return npolicy(path)
+        return npolicy(fpath)
 
     def setup(self):
         """Tries to setup everything needed to ensure that this
@@ -155,14 +158,11 @@ class BaseStorage(object):
     def store(self, finst):
         """Actually stores the file.
         """
-        fname = getattr(finst, 'filename', finst.name)
-        fname = os.path.basename(fname)
-        fpath = os.path.join(self.dest, fname)
-        fpath = self.get_name(fpath)
-        open(fpath, 'w').write(finst.read())
+        name = self.get_name(finst)
+        open(name, 'w').write(finst.read())
 
         # Time to say to the user where's the uploaded file
-        new_name = os.path.basename(fpath)
+        new_name = os.path.basename(name)
         if not self.base_uri.endswith('/'):
             self.base_uri += '/'
         return self.base_uri + new_name
