@@ -11,11 +11,11 @@ priority = 10
 
 [videocdbr]
 type = local
-dest = /srv/apps/lincoln/videocdbr/data/files
+dest = /srv/dev/videocdbr/files
 name_policy = preserve_ext
 structure = subfolder
 base_uri = http://files.videocdbr.cabare
-priority = 1
+priority = 0
 weight = 10
 
 [vodka]
@@ -28,5 +28,5 @@ host = vodka.buteco
 port = 22
 user = lincoln
 password = 123
-priority = 0
+priority = 2
 weight = 10

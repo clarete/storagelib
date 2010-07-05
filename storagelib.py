@@ -155,7 +155,8 @@ class BaseStorage(object):
     def store(self, finst):
         """Actually stores the file.
         """
-        fname = os.path.basename(finst.name)
+        fname = getattr(finst, 'filename', finst.name)
+        fname = os.path.basename(fname)
         fpath = os.path.join(self.dest, fname)
         fpath = self.get_name(fpath)
         open(fpath, 'w').write(finst.read())
