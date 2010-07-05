@@ -1,3 +1,6 @@
+[Default]
+plugins = ssh
+
 [temporary]
 type = local
 dest = /tmp

@@ -43,6 +43,16 @@ _STORAGES = {}
 
 _NAME_POLICIES = {}
 
+def register_storage_type(klass):
+    _STORAGES[klass.type_] = klass
+    klass.extra_attrs = []
+    if klass.__name__ != 'BaseStorage':
+        for key in dir(klass):
+            val = getattr(klass, key)
+            if isinstance(val, Attr):
+                klass.extra_attrs.append(key)
+                setattr(klass, key, getattr(klass, key).default)
+
 def np_random(path):
     """Creates a random name for a file being stored
     """
@@ -98,15 +108,7 @@ class StorageMeta(type):
     """
     def __new__(mcs, name, bases, attrs):
         klass = type.__new__(mcs, name, bases, attrs)
-        _STORAGES[klass.type_] = klass
-
-        klass.extra_attrs = []
-
-        if name != 'BaseStorage':
-            for key, val in attrs.items():
-                if isinstance(val, Attr):
-                    klass.extra_attrs.append(key)
-                    setattr(klass, key, getattr(klass, key).default)
+        register_storage_type(klass)
         return klass
 
 class BaseStorage(object):
@@ -159,17 +161,6 @@ class BaseStorage(object):
             self.base_uri += '/'
         return self.base_uri + new_name
 
-class SshStorage(BaseStorage):
-    """A ssh storage
-
-    This is very closer to the other storages the only difference is
-    that it uses the ssh protocol to copy files.
-    """
-    type_ = 'ssh'
-
-    host = Attr()
-    user = Attr()
-
 def cmp_storages(repo1, repo2):
     """A function used to do the first sort at the repos list putting
     all repositories with the lower priority first.
@@ -196,7 +187,22 @@ class StorageContext(object):
         """
         cfg = ConfigParser()
         cfg.read([cfg_file])
+
+        # Reading the Default section looking for the plugins entry
+        # and loading all of them.
+        if cfg.has_section('Default') and \
+                cfg.has_option('Default', 'plugins'):
+            plugins = cfg.get('Default', 'plugins').split(',')
+            for i in plugins:
+                module = __import__(i.strip(), globals(), fromlist='Storage')
+                register_storage_type(module.Storage)
+
         for i in cfg.sections():
+            # We can't handle the Default secion as a storage
+            if i == 'Default':
+                continue
+
+            # The storage instance
             storage = _STORAGES[cfg.get(i, 'type')]()
 
             # reading attrs defined in BaseStorage
