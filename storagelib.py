@@ -1,6 +1,6 @@
 # -*- Coding: utf-8; Mode: Python -*-
 #
-# videocdbrd - Executable that launches the video platform
+# storagelib.py - A simple and extensible storage library
 #
 # Copyright (C) 2010  Lincoln de Sousa <lincoln@comum.org>
 #
