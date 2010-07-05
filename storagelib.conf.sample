@@ -15,16 +15,18 @@ dest = /srv/apps/lincoln/videocdbr/data/files
 name_policy = preserve_ext
 structure = subfolder
 base_uri = http://files.videocdbr.cabare
-priority = 0
+priority = 1
 weight = 10
 
 [vodka]
 type = ssh
-dest = /var/www/files
+dest = /var/www/lincoln/files
 name_policy = random
 structure = simple
-base_uri = http://vodka.buteco/files
+base_uri = http://vodka.buteco/lincoln/files
 host = vodka.buteco
+port = 22
 user = lincoln
-priority = 1
+password = 123
+priority = 0
 weight = 10
