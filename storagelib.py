@@ -153,6 +153,12 @@ class BaseStorage(object):
         fpath = self.get_name(fpath)
         open(fpath, 'w').write(finst.read())
 
+        # Time to say to the user where's the uploaded file
+        new_name = os.path.basename(fpath)
+        if not self.base_uri.endswith('/'):
+            self.base_uri += '/'
+        return self.base_uri + new_name
+
 class SshStorage(BaseStorage):
     """A ssh storage
 
@@ -265,7 +271,7 @@ def test():
     """Call the API with fake params to test
     """
     ctx = StorageContext(sys.argv[1])
-    ctx.store(file('/etc/resolv.conf'))
+    print ctx.store(file('/etc/resolv.conf'))
 
 if __name__ == '__main__':
     test()
