@@ -278,6 +278,20 @@ class StorageContext(object):
                 continue
             return storage.store(finst)
 
+def store(finst):
+    """Instantiates the `StorageContext' class and then calls its
+    store method.
+
+    The configuration file passed to StorageContext's constructor is
+    the one found in the STORAGELIB_CONFIG_FILE environment var. If it
+    is not set, an error is raised.
+    """
+    cfg = os.environ.get('STORAGELIB_CONFIG_FILE')
+    if not cfg:
+        raise Exception('STORAGELIB_CONFIG_FILE environment var not set')
+    ctx = StorageContext(cfg)
+    return ctx.store(finst)
+
 def test():
     """Call the API with fake params to test
     """
