@@ -44,6 +44,11 @@ _STORAGES = {}
 _NAME_POLICIES = {}
 
 def register_storage_type(klass):
+    """Register a storage class in the _STORAGES dictionary
+
+    It also fills the `extra_attrs' attribute of the given klass to
+    make it possible to load these parameters from the config file.
+    """
     _STORAGES[klass.type_] = klass
     klass.extra_attrs = []
     if klass.__name__ != 'BaseStorage':
