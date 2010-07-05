@@ -49,14 +49,14 @@ def register_storage_type(klass):
     It also fills the `extra_attrs' attribute of the given klass to
     make it possible to load these parameters from the config file.
     """
+    if not hasattr(klass, 'extra_attrs'):
+        klass.extra_attrs = []
+    for key in dir(klass):
+        val = getattr(klass, key)
+        if isinstance(val, Attr):
+            klass.extra_attrs.append(key)
+            setattr(klass, key, getattr(klass, key).default)
     _STORAGES[klass.type_] = klass
-    klass.extra_attrs = []
-    if klass.__name__ != 'BaseStorage':
-        for key in dir(klass):
-            val = getattr(klass, key)
-            if isinstance(val, Attr):
-                klass.extra_attrs.append(key)
-                setattr(klass, key, getattr(klass, key).default)
 
 def np_random(path):
     """Creates a random name for a file being stored
