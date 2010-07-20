@@ -279,7 +279,7 @@ class StorageContext(object):
                 continue
             return storage.store(finst)
 
-def store(finst):
+def store(finst, config_file=None):
     """Instantiates the `StorageContext' class and then calls its
     store method.
 
@@ -287,7 +287,7 @@ def store(finst):
     the one found in the STORAGELIB_CONFIG_FILE environment var. If it
     is not set, an error is raised.
     """
-    cfg = os.environ.get('STORAGELIB_CONFIG_FILE')
+    cfg =  config_file or os.environ.get('STORAGELIB_CONFIG_FILE')
     if not cfg:
         raise Exception('STORAGELIB_CONFIG_FILE environment var not set')
     ctx = StorageContext(cfg)
