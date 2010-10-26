@@ -65,7 +65,8 @@ class Storage(BaseStorage):
         """Stores the file using the paramiko.SFTPClient object
         """
         name = self.get_name(finst)
-        self.client.open(name, 'w').write(finst.read())
+        content = self.get_content(finst)
+        self.client.open(name, 'wb').write(content)
 
         # Closing ssh connection
         self.client.close()

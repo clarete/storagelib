@@ -140,11 +140,22 @@ class BaseStorage(object):
         only calls the proper name policy giving the original name as
         argument.
         """
-        fname = getattr(finst, 'filename', finst.name)
-        fname = os.path.basename(fname)
+        if isinstance(finst, basestring):
+            fname = '__memory__'
+        else:
+            fname = getattr(finst, 'filename', finst.name)
+            fname = os.path.basename(fname)
         fpath = os.path.join(self.dest, fname)
         npolicy = _NAME_POLICIES[self.name_policy]
         return npolicy(fpath)
+
+    def get_content(self, finst):
+        """Gets the content of the file-like or buffer
+        """
+        if hasattr(finst, 'read'):
+            return finst.read()
+        else:
+            return finst
 
     def setup(self):
         """Tries to setup everything needed to ensure that this
@@ -159,7 +170,8 @@ class BaseStorage(object):
         """Actually stores the file.
         """
         name = self.get_name(finst)
-        open(name, 'w').write(finst.read())
+        content = self.get_content(finst)
+        open(name, 'w').write(content)
 
         # Time to say to the user where's the uploaded file
         new_name = os.path.basename(name)
